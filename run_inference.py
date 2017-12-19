@@ -66,15 +66,13 @@ def img_captions(file_inputs):
     for filename in filenames:
       with tf.gfile.GFile(filename, "rb") as f:
         image = f.read()
-      captions = generator.beam_search(sess, image)
+      captions, probs = generator.beam_search(sess, image)
+
+      caption_list = list()
       print("Captions for image %s:" % os.path.basename(filename))
       for i, caption in enumerate(captions):
         # Ignore begin and end words.
         sentence = [vocab.id_to_word(w) for w in caption.sentence[1:-1]]
         sentence = " ".join(sentence)
-        print("  %d) %s (p=%f)" % (i, sentence, math.exp(caption.logprob)))
-
-# File Inputs
-file_input = ['models/model2.ckpt-2000000', 'models/word_counts.txt', 'imgs/dinner.jpg']
-
-img_captions(file_input)
+        caption_list.append(("  %d) %s (p=%f)" % (i, sentence, math.exp(caption.logprob))))
+  return probs, caption_list
