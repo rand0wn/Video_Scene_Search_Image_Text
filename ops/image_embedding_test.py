@@ -20,8 +20,9 @@ from __future__ import division
 from __future__ import print_function
 
 # Folder Lib Import
+import os
 import sys
-sys.path.insert(0, '/home/abhishek/PycharmProjects/VN/ops')
+sys.path.insert(0, os.getcwd() + '/ops')
 # Folder Lib Import
 
 import tensorflow as tf

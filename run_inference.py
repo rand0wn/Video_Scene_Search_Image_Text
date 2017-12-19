@@ -26,7 +26,7 @@ import inference_wrapper
 
 # Folder Lib Import
 import sys
-sys.path.insert(0, '/home/abhishek/PycharmProjects/VN/inference_utils')
+sys.path.insert(0, os.getcwd() + '/inference_utils')
 # Folder Lib Import
 import configuration
 import caption_generator
@@ -64,7 +64,7 @@ def img_captions(file_inputs):
     generator = caption_generator.CaptionGenerator(model, vocab)
 
     for filename in filenames:
-      with tf.gfile.GFile(filename, "r") as f:
+      with tf.gfile.GFile(filename, "rb") as f:
         image = f.read()
       captions = generator.beam_search(sess, image)
       print("Captions for image %s:" % os.path.basename(filename))
@@ -75,6 +75,6 @@ def img_captions(file_inputs):
         print("  %d) %s (p=%f)" % (i, sentence, math.exp(caption.logprob)))
 
 # File Inputs
-file_input = ['/home/abhishek/PycharmProjects/VN/models/model2.ckpt-2000000', '/home/abhishek/PycharmProjects/VN/models/word_counts.txt', '/home/abhishek/PycharmProjects/VN/imgs/dinner.jpg']
+file_input = ['models/model2.ckpt-2000000', 'models/word_counts.txt', 'imgs/dinner.jpg']
 
 img_captions(file_input)

@@ -21,7 +21,8 @@ from __future__ import print_function
 
 # Folder Lib Import
 import sys
-sys.path.insert(0, '/home/abhishek/PycharmProjects/VN/inference_utils')
+import os
+sys.path.insert(0, os.getcwd() + '/inference_utils')
 # Folder Lib Import
 
 import show_and_tell_model
