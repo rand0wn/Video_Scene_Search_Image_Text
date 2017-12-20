@@ -63,16 +63,19 @@ def img_captions(file_inputs):
     # available beam search parameters.
     generator = caption_generator.CaptionGenerator(model, vocab)
 
+    caption_list = list()
+    prob_list = list()
     for filename in filenames:
       with tf.gfile.GFile(filename, "rb") as f:
         image = f.read()
       captions, probs = generator.beam_search(sess, image)
+      prob_list.append('['+", ".join(map(str, probs))+']')
 
-      caption_list = list()
-      print("Captions for image %s:" % os.path.basename(filename))
+      loc_cap_list = list()
       for i, caption in enumerate(captions):
         # Ignore begin and end words.
         sentence = [vocab.id_to_word(w) for w in caption.sentence[1:-1]]
-        sentence = " ".join(sentence)
-        caption_list.append(("  %d) %s (p=%f)" % (i, sentence, math.exp(caption.logprob))))
-  return probs, caption_list
+        sentence = " ".join(sentence).split('<S>')[0]
+        loc_cap_list.append([sentence, math.exp(caption.logprob)])
+      caption_list.append(loc_cap_list)
+  return prob_list, caption_list
