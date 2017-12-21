@@ -1,9 +1,11 @@
 """Class for training video for search and performing other operations."""
-
+import nltk
 import numpy as np
 import cv2
 import pandas as pd
 import run_inference
+from nltk.corpus import stopwords
+
 
 # Video Data
 vd_data = './vd_data'
@@ -55,6 +57,13 @@ class Video(object):
                     prob, cap = run_inference.img_captions(file_input)
                     vd_df.iloc[len_vd_df:, vd_df.columns.get_loc("prob")] = prob
                     vd_df.iloc[len_vd_df:, vd_df.columns.get_loc("caps")] = cap
+
+                    for i in range(0, len(cap)):
+                        words = nltk.re.sub("[^a-zA-Z]", " ", str(cap[i]))
+                        words = list(set(words.split(' ')))
+                        stop = set(stopwords.words("english"))
+                        rem_words = [w for w in words if not w in stop and len(w) > 2]
+                        vd_df.iloc[len_vd_df+i, vd_df.columns.get_loc("words")] = str(rem_words)
 
                     # Update Final Changes to CSV
                     vd_df.to_csv(vd_data + '/vd_data.csv', index=False)
