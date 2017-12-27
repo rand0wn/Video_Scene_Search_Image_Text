@@ -5,6 +5,7 @@ import cv2
 import pandas as pd
 import run_inference
 from nltk.corpus import stopwords
+from sklearn.metrics import mean_squared_error as mse
 
 
 # Video Data
@@ -70,7 +71,39 @@ class Video(object):
                     len_vd_df = vd_df.shape[0]  # Update Length
                     break
 
+
+# Image Frame Prob
+def _map_frame_prob(str_frame_prob):
+    return map(float, str_frame_prob[1:len(str_frame_prob) - 1].split(', '))
+
+
+# Frame Prob Indexing
+def _frame_indexing(image_idx, prob):
+    image_matches = {}
+
+    if image_idx == -1:
+        frame_prob = prob
+
+    frame_prob = _map_frame_prob(vd_df['prob'][image_idx])
+    image_matches[vd_df['frame'][image_idx]] = {}
+
+    for i in range(0, len(vd_df) - 1):
+        mse_prob = mse(frame_prob, _map_frame_prob(vd_df['prob'][i + 1]))
+        image_matches[vd_df['frame'][image_idx]][mse_prob] = {}
+        image_matches[vd_df['frame'][image_idx]][mse_prob]['img'] = vd_df['frame'][i + 1]
+
+    return image_matches
+
+
+# External Image Indexing
+def _ext_img_idx(path):
+    file_input = ['models/model2.ckpt-2000000', 'models/word_counts.txt', path]
+    prob, cap = run_inference.img_captions(file_input)
+    img_prob = _map_frame_prob(prob)
+
+    return _frame_indexing(-1, img_prob)
+
 # Train Videos
-v = Video(filenames='', frame_frequency=0, audio_or_sub=0)
+v = Video(filenames='./vd_data/videos/PADMAN Official Trailer - Akshay Kumar - Sonam Kapoor - Radhika Apte - 26th Jan 2018.mp4,./vd_data/videos/Eminem - Not Afraid.mp4,./vd_data/videos/Maroon 5 - Sugar.mp4', frame_frequency=0, audio_or_sub=0)
 
 v.train_videos()
